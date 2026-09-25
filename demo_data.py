@@ -12,12 +12,13 @@ def generate_raw_log(kind: str) -> tuple[str, str]:
     else:
         return f"Malformed log entry {random.randint(1000, 9999)} missing field values...", source
 
-def get_demo_logs(count: int = 10) -> list[tuple[str, str]]:
+def get_demo_logs(count: int = 10, unknown_weight: int = 12) -> list[tuple[str, str]]:
     """Generate a batch of raw log strings with their sources."""
     logs = []
+    known_weight = 100 - unknown_weight - 8
     for _ in range(count):
         kind = random.choices(
-            ["known", "unknown", "failed"], weights=[80, 12, 8]
+            ["known", "unknown", "failed"], weights=[known_weight, unknown_weight, 8]
         )[0]
         logs.append(generate_raw_log(kind))
     return logs

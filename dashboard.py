@@ -41,8 +41,13 @@ for src, patterns in approved.items():
         KNOWN_PATTERNS[src] = []
     KNOWN_PATTERNS[src].extend(patterns)
 
+if "ingest_clicks" not in st.session_state:
+    st.session_state.ingest_clicks = 0
+
 def ingest_demo_batch():
-    logs = demo_data.get_demo_logs(10)
+    st.session_state.ingest_clicks += 1
+    unknown_weight = 12 if st.session_state.ingest_clicks == 1 else 2
+    logs = demo_data.get_demo_logs(10, unknown_weight)
     for raw_text, source in logs:
         route_log(conn, raw_text, source, KNOWN_PATTERNS)
     
@@ -57,6 +62,9 @@ def ingest_malformed():
 
 def reset_db():
     cancel_pipeline()
+    
+    if "ingest_clicks" in st.session_state:
+        st.session_state.ingest_clicks = 0
     
     # Wait briefly for any active background thread to cleanly exit its current loop
     time.sleep(1.5)
